@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block content %}
+<div class="card" style="max-width:700px;">
+  <h1>Results</h1>
+  <p class="subtitle">Raw submissions so far.</p>
+
+  <h3>Skills Self-Assessment ({{ data.skills|length }})</h3>
+  <table>
+    <tr><th>Name</th><th>Coding</th><th>Problem Solving</th><th>AI Tools</th><th>Confidence</th><th>Comments</th></tr>
+    {% for r in data.skills %}
+    <tr>
+      <td>{{ r.name }}</td><td>{{ r.coding }}</td><td>{{ r.problem_solving }}</td>
+      <td>{{ r.ai_tools }}</td><td>{{ r.confidence }}</td><td>{{ r.comments }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h3 style="margin-top:32px;">NPS ({{ data.nps|length }})</h3>
+  <table>
+    <tr><th>Name</th><th>Score</th><th>Comments</th></tr>
+    {% for r in data.nps %}
+    <tr><td>{{ r.name }}</td><td>{{ r.score }}</td><td>{{ r.comments }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <p style="margin-top:24px;"><a href="{{ url_for('home') }}">← Back to home</a></p>
+</div>
+{% endblock %}
