@@ -1,29 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Results{% endblock %}
+{% block title %}NPS Survey{% endblock %}
 {% block content %}
-<div class="card" style="max-width:700px;">
-  <h1>Results</h1>
-  <p class="subtitle">Raw submissions so far.</p>
+<div class="card">
+  <h1>How likely are you to recommend this class?</h1>
+  <p class="subtitle">0 = Not at all likely, 10 = Extremely likely</p>
+  <form method="POST">
+    <label for="name">Your name</label>
+    <input type="text" id="name" name="name" placeholder="Optional">
 
-  <h3>Skills Self-Assessment ({{ data.skills|length }})</h3>
-  <table>
-    <tr><th>Name</th><th>Coding</th><th>Problem Solving</th><th>AI Tools</th><th>Confidence</th><th>Comments</th></tr>
-    {% for r in data.skills %}
-    <tr>
-      <td>{{ r.name }}</td><td>{{ r.coding }}</td><td>{{ r.problem_solving }}</td>
-      <td>{{ r.ai_tools }}</td><td>{{ r.confidence }}</td><td>{{ r.comments }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+    <label>Your score</label>
+    <div class="scale">
+      {% for i in range(0,11) %}
+      <input type="radio" id="score{{i}}" name="score" value="{{i}}" {% if i==8 %}checked{% endif %}>
+      <label for="score{{i}}">{{i}}</label>
+      {% endfor %}
+    </div>
+    <div class="scale-caption"><span>Not likely</span><span>Extremely likely</span></div>
 
-  <h3 style="margin-top:32px;">NPS ({{ data.nps|length }})</h3>
-  <table>
-    <tr><th>Name</th><th>Score</th><th>Comments</th></tr>
-    {% for r in data.nps %}
-    <tr><td>{{ r.name }}</td><td>{{ r.score }}</td><td>{{ r.comments }}</td></tr>
-    {% endfor %}
-  </table>
+    <label for="comments">What's the main reason for your score?</label>
+    <textarea id="comments" name="comments" placeholder="Optional"></textarea>
 
-  <p style="margin-top:24px;"><a href="{{ url_for('home') }}">← Back to home</a></p>
+    <button type="submit">Submit</button>
+  </form>
 </div>
 {% endblock %}
