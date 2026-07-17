@@ -1,26 +1,9 @@
 {% extends "base.html" %}
-{% block title %}NPS Survey{% endblock %}
+{% block title %}Thank You{% endblock %}
 {% block content %}
 <div class="card">
-  <h1>How likely are you to recommend this class?</h1>
-  <p class="subtitle">0 = Not at all likely, 10 = Extremely likely</p>
-  <form method="POST">
-    <label for="name">Your name</label>
-    <input type="text" id="name" name="name" placeholder="Optional">
-
-    <label>Your score</label>
-    <div class="scale">
-      {% for i in range(0,11) %}
-      <input type="radio" id="score{{i}}" name="score" value="{{i}}" {% if i==8 %}checked{% endif %}>
-      <label for="score{{i}}">{{i}}</label>
-      {% endfor %}
-    </div>
-    <div class="scale-caption"><span>Not likely</span><span>Extremely likely</span></div>
-
-    <label for="comments">What's the main reason for your score?</label>
-    <textarea id="comments" name="comments" placeholder="Optional"></textarea>
-
-    <button type="submit">Submit</button>
-  </form>
+  <h1>Thanks! 🎉</h1>
+  <p class="subtitle">Your response has been recorded.</p>
+  <a href="{{ url_for('home') }}">← Back to home</a>
 </div>
 {% endblock %}
