@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block title %}NPS Survey{% endblock %}
+{% block title %}Leave a Review{% endblock %}
 {% block content %}
 <div class="card">
-  <h1>How likely are you to recommend this class?</h1>
-  <p class="subtitle">0 = Not at all likely, 10 = Extremely likely</p>
+  <h1>How was your meeting with us?</h1>
+  <p class="subtitle">How likely are you to recommend our firm to a friend or colleague? 0 = Not at all likely, 10 = Extremely likely</p>
   <form method="POST">
     <label for="name">Your name</label>
-    <input type="text" id="name" name="name" placeholder="Optional">
+    <input type="text" id="name" name="name" placeholder="Optional" value="{{ name|default('') }}">
+    <input type="hidden" name="email" value="{{ email|default('') }}">
 
     <label>Your score</label>
     <div class="scale">

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Leave a Review{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Thanks for meeting with us</h1>
+  <p class="subtitle">We'd love your feedback. Sharing your name and email is optional — it just helps us follow up with you personally.</p>
+  <form method="POST">
+    <label for="name">Your name</label>
+    <input type="text" id="name" name="name" placeholder="Optional">
+
+    <label for="email">Your email</label>
+    <input type="text" id="email" name="email" placeholder="Optional">
+
+    <button type="submit">Continue to Review</button>
+  </form>
+  <p style="margin-top:16px; text-align:center;">
+    <a href="{{ url_for('nps') }}">Skip and leave feedback anonymously →</a>
+  </p>
+</div>
+{% endblock %}
