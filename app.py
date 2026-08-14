@@ -1,6 +1,8 @@
 import os
 import json
+import hmac
 import smtplib
+from functools import wraps
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
@@ -10,6 +12,15 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
 DATA_FILE = "responses.json"
+
+
+def admin_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not session.get("is_admin"):
+            return redirect(url_for("admin_login", next=request.path))
+        return view(*args, **kwargs)
+    return wrapped
 
 
 def load_responses():
@@ -213,7 +224,28 @@ def thanks():
     return render_template("thanks.html")
 
 
+@app.route("/admin-login", methods=["GET", "POST"])
+def admin_login():
+    error = None
+    next_url = request.values.get("next") or url_for("results")
+    if request.method == "POST":
+        admin_password = os.environ.get("ADMIN_PASSWORD")
+        submitted = request.form.get("password", "")
+        if admin_password and hmac.compare_digest(submitted, admin_password):
+            session["is_admin"] = True
+            return redirect(request.form.get("next") or url_for("results"))
+        error = "Incorrect password."
+    return render_template("admin_login.html", error=error, next=next_url)
+
+
+@app.route("/admin-logout")
+def admin_logout():
+    session.pop("is_admin", None)
+    return redirect(url_for("home"))
+
+
 @app.route("/results")
+@admin_required
 def results():
     data = load_responses()
     return render_template("results.html", data=data, score_tier=score_tier)

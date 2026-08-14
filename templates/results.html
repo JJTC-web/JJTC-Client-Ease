@@ -36,6 +36,9 @@
     {% endfor %}
   </table>
 
-  <p style="margin-top:24px;"><a href="{{ url_for('home') }}">← Back to home</a></p>
+  <p style="margin-top:24px;">
+    <a href="{{ url_for('home') }}">← Back to home</a> ·
+    <a href="{{ url_for('admin_logout') }}">Log out</a>
+  </p>
 </div>
 {% endblock %}
