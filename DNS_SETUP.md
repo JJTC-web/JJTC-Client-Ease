@@ -4,65 +4,53 @@ Reference notes for hosting the two production apps under the already
 registered `jjtc.info` domain (managed in GoDaddy), via Railway custom
 domains.
 
-## Apps and subdomains
+## Apps and subdomains (already live)
 
-| Subdomain | App | Repo |
-|---|---|---|
-| `app.jjtc.info` | JJTC client onboarding app (welcome, intake, checklist, admin dashboard) | [`JJTC-web/JJTC-Guided-Onboarding`](https://github.com/JJTC-web/JJTC-Guided-Onboarding) |
-| `os.jjtc.info` | MissionOS AI (nonprofit organizational health assessment) | [`JJTC-web/Missions-ai`](https://github.com/JJTC-web/Missions-ai) |
+Both subdomains already have working GoDaddy CNAME records pointing at their
+Railway apps — this was already fully set up, contrary to earlier drafts of
+this doc that assumed `app.jjtc.info` / `os.jjtc.info` still needed to be
+created:
 
-`os.jjtc.info` was chosen over `missionos.jjtc.info` — shorter, and easier to
-migrate off later if MissionOS ever gets its own dedicated domain.
+| Subdomain | App | Repo | CNAME target |
+|---|---|---|---|
+| `onboarding.jjtc.info` | JJTC client onboarding app (welcome, intake, checklist, admin dashboard) | [`JJTC-web/JJTC-Guided-Onboarding`](https://github.com/JJTC-web/JJTC-Guided-Onboarding) | `web-production-51ad4.up.railway.app` |
+| `missions.jjtc.info` | MissionOS AI (nonprofit organizational health assessment) | [`JJTC-web/Missions-ai`](https://github.com/JJTC-web/Missions-ai) | `6i8u490x.up.railway.app` |
 
 Both apps are Flask services deployed on Railway (each has a `Procfile`
-running gunicorn), so each gets its own Railway custom-domain entry pointed
-at a different subdomain of the same `jjtc.info` root domain.
+running gunicorn).
 
 `JJTC-Client-Ease` (this repo) is a separate, standalone survey tool and is
 not part of this hosting plan — these notes live here for reference only.
 
-## DNS records (GoDaddy)
+## If a subdomain won't load
 
-GoDaddy → My Products → `jjtc.info` → DNS → Add Record:
+Since DNS already resolves correctly for both, a "can't open this site"
+report is not a missing-DNS-record problem. Check, in order:
 
-| Type | Name | Value | TTL |
-|---|---|---|---|
-| CNAME | `app` | *(CNAME target Railway gives the Guided-Onboarding project)* | 1 hour |
-| CNAME | `os` | *(CNAME target Railway gives the Missions-ai project)* | 1 hour |
+1. **Railway custom domain status** — in each Railway project → Settings →
+   Networking, confirm the custom domain shows a green "verified" checkmark
+   and not "Waiting for DNS" or an SSL-pending state.
+2. **App-level errors** — the Flask app itself may be erroring (500), or a
+   required env var (`DATABASE_URL`, `SUPABASE_URL`, etc.) may be unset on
+   that Railway service. Check Railway's deploy logs.
+3. **Browser-specific issues** — stale DNS cache, a typo in the URL, or an
+   ISP/DNS resolver that hasn't picked up the record yet.
 
-## Steps
-
-1. In Railway, open the **JJTC-Guided-Onboarding** project → Settings →
-   Networking → Custom Domain → enter `app.jjtc.info`. Copy the CNAME target
-   Railway shows.
-2. In Railway, open the **Missions-ai** project → Settings → Networking →
-   Custom Domain → enter `os.jjtc.info`. Copy its CNAME target.
-3. Before adding records, check GoDaddy's existing DNS list to make sure
-   `app` or `os` isn't already used (e.g. by Website Builder).
-4. In GoDaddy DNS for `jjtc.info`, add the two CNAME records above using the
-   values from steps 1–2.
-5. Save and wait for propagation. Railway shows "Waiting for DNS" then a
-   green checkmark once it verifies, and auto-issues SSL.
-
-## Follow-up once subdomains are live
-
-Both apps were originally configured against their default Railway-provided
-hostnames. After the custom domains go live:
+## Follow-up items
 
 - **JJTC-Guided-Onboarding**: already sends email from `hello@jjtc.info` and
   links to `https://www.jjtc.info`, so the root domain is already verified in
-  Resend. One hardcoded reference has been fixed to track the new domain: the
-  workbook PDF link (`app.py`, previously
-  `https://web-production-51ad4.up.railway.app/static/workbook.pdf`) now
-  reads from an `APP_BASE_URL` env var (see `env.example`) — set
-  `APP_BASE_URL=https://app.jjtc.info` on the Railway service once the custom
-  domain is verified. (Pushed on branch `claude/app-base-url-jjtc-info`.)
+  Resend. The previously hardcoded workbook PDF link
+  (`https://web-production-51ad4.up.railway.app/static/workbook.pdf`) now
+  reads from an `APP_BASE_URL` env var (see `env.example`), defaulting to
+  `https://onboarding.jjtc.info` — the real, already-live custom domain.
+  (Pushed on branch `claude/app-base-url-jjtc-info`.)
 - **Missions-ai**: `RESEND_FROM_EMAIL` currently defaults to Resend's test
   sender (`onboarding@resend.dev`). Verify `jjtc.info` (or a subdomain of it)
   in Resend and set `RESEND_FROM_EMAIL` to something like
-  `MissionOS AI <notifications@os.jjtc.info>` before sending to real
+  `MissionOS AI <notifications@missions.jjtc.info>` before sending to real
   submitters.
-- **Both apps**: update Supabase Auth's Site URL / Redirect URLs (in each
-  Supabase project's Auth settings) from the old `*.up.railway.app` hostname
-  to the matching `jjtc.info` subdomain, so `/dashboard` login redirects work
-  correctly on the new domain.
+- **Both apps**: check Supabase Auth's Site URL / Redirect URLs (in each
+  Supabase project's Auth settings) reference `onboarding.jjtc.info` /
+  `missions.jjtc.info` rather than the old `*.up.railway.app` hostname, so
+  `/dashboard` login redirects work correctly on the custom domain.
